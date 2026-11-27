@@ -1,0 +1,117 @@
+
+
+
+bus_network = {
+    "Durg": {
+        "Bhilai": 30,
+        "Raipur": 30,
+        "Rajnandgaon": 45
+    },
+    "Bhilai": {
+        "Durg": 30,
+        "Raipur": 30
+    },
+    "Raipur": {
+        "Durg": 40,
+        "Bhilai": 30,
+        "Bilaspur": 110,
+        "Dhamtari": 80
+    },
+    "Bilaspur": {
+        "Raipur": 110
+    },
+    "Dhamtari": {
+        "Raipur": 80
+    },
+    "Rajnandgaon": {
+        "Durg": 45
+    },
+    "Jagdalpur": {
+        "Kondagaon": 75
+    },
+    "Kondagaon": {
+        "Jagdalpur": 75
+    }
+}
+
+FARE_PER_KM = 1.50
+
+
+
+def show_connections(stop):
+    if stop not in bus_network:
+        print("Stop", stop, "not found.")
+        return
+
+    print(stop, "connects to:")
+
+    for neighbour, distance in bus_network[stop].items():
+        print(neighbour, "(", distance, "km )")
+
+
+
+def find_route(source, destination):
+
+    if source not in bus_network or destination not in bus_network:
+        print("Invalid bus stop.")
+        return
+
+    if source == destination:
+        print("Source and destination are the same. Distance: 0 km.")
+        print("Fare: Rs. 0.00")
+        return
+
+    queue = [[source]]
+    visited = {source}
+
+    while queue:
+        path = queue.pop(0)
+        current = path[-1]
+
+        if current == destination:
+            distance = 0
+
+            for i in range(len(path) - 1):
+                distance += bus_network[path[i]][path[i + 1]]
+
+            fare = distance * FARE_PER_KM
+
+            print("Route:", " -> ".join(path))
+            print("Stops:", len(path))
+            print("Distance:", distance, "km")
+            print("Fare: Rs.", format(fare, ".2f"))
+            return
+
+        for neighbour in bus_network[current]:
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(path + [neighbour])
+
+    print("No route available between", source, "and", destination)
+
+
+
+while True:
+
+    print("\n===== BUS ROUTE MANAGEMENT SYSTEM =====")
+    print("1. Show Connections")
+    print("2. Find Route")
+    print("3. Exit")
+
+    choice = input("Enter your choice: ")
+
+    if choice == "1":
+        stop = input("Enter bus stop: ").strip().title()
+        show_connections(stop)
+
+    elif choice == "2":
+        source = input("From: ").strip().title()
+        destination = input("To: ").strip().title()
+        find_route(source, destination)
+
+    elif choice == "3":
+        print("Thank you!")
+        break
+
+    else:
+        print("Invalid choice. Try again.")
